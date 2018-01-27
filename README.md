@@ -19,7 +19,7 @@ Revelar historia por medio de los mensajes desencriptados (Opcional en desarroll
 - Algunas de estas _uniones_ estan rotas y no pueden enviarse mensajes a traves de ellas. Esto es invisible al jugador.
 - Internamente el programa plantea una ruta invisible entre la antena inicial (Emisora) y la final (Receptora). En la esquina superior derecha se mostrara la cantidad de antenas por las que debe pasar para completar la ruta.
 - Todas las _antenas_, menos la emisora, inician desactivadas. La emisora comenzara a parpadear intermitentemente por la cantidad de        distancia que esta el mensaje de ella (inicialmente 1, debido a que estara en camino a la primera antena). Alternativamente, podra      aparecer el numero debajo de la antena.
-- El mensaje viajara a una velocidad fija (10 segundos por antena). . Ej: En una ruta que deba pasar por cuatro antenas, el mensaje tardara 40 segundos (AE -> A1 -> A2 -> A3 -> AR).
+- El mensaje viajara a una velocidad fija (10 segundos por antena). Ej: En una ruta que deba pasar por cuatro antenas, el mensaje tardara 40 segundos (AE -> A1 -> A2 -> A3 -> AR).
 
 ## Gameplay
 - El jugador puede clickear sobre cualquier antena desactivada (o aparentemente desactivada). 
@@ -36,7 +36,7 @@ Revelar historia por medio de los mensajes desencriptados (Opcional en desarroll
 La fase termina una vez que:
 - El mensaje llega a la terminal. Esto dara un strike al jugador. Si se tiene 3 strikes, el juego termina.
 - El mensaje no puede llegar a la terminal (Todos los caminos estan bloqueados). El jugador recibe 3 puntos.
-- El mensaje no puede llegar a la terminal (La terminal ha sido bloquedada). El jugador recibe 10 puntos.
+- El mensaje no puede llegar a la terminal (La terminal ha sido bloquedada). El jugador recibe 15 puntos.
 
 Una vez terminada la fase, se elegira a otro emisor y receptor. Luego de 5 fases se ofrecera la opcion de terminar el juego o seguir jugando. Si se sigue, se redibujaran las uniones.
 
