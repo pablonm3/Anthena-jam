@@ -28,14 +28,23 @@ Revelar historia por medio de los mensajes desencriptados (Opcional en desarroll
  - Si la ruta no pasa por ahi, avisa que el camino esta libre.
  - Si el camino entre la ultima antena comprobada como parte de la ruta y la antena pingeada esta rota, avisa que el camino esta roto.
  - Si la ruta de comunicación actual pasa por esta antena, avisa que esta ocupada.
-   - En este ultimo caso avisara si ya ha pasado por alli (Aparece un 1, si esta siendo transmitido desde alli) o si aun no ha pasado        (Aparece un 0). De ambas maneras la antena aparecer activa.
+   - En este ultimo caso avisara si ya ha pasado por alli (Aparece un 1, si esta siendo transmitido desde alli) o si aun no ha pasado        (Aparece un 0). De ambas maneras la antena aparecer activa y el jugador gana 1 punto.
    - En el caso de que ya haya pasado los pingeos pasaran automaticamente por alli.
    - En el caso de que aun no haya pasado se podra anular la antena, si se disponen de tokens de anulación.
    
 ### Final de fase
 La fase termina una vez que:
 - El mensaje llega a la terminal. Esto dara un strike al jugador. Si se tiene 3 strikes, el juego termina.
-- El mensaje no puede llegar a la terminal (Todos los caminos estan bloqueados). El jugador recibe 2 puntos.
+- El mensaje no puede llegar a la terminal (Todos los caminos estan bloqueados). El jugador recibe 3 puntos.
 - El mensaje no puede llegar a la terminal (La terminal ha sido bloquedada). El jugador recibe 10 puntos.
 
-Una vez terminada la fase, se elegira a otro emisor y receptor. Luego de 5 fases se redibujaran las uniones.
+Una vez terminada la fase, se elegira a otro emisor y receptor. Luego de 5 fases se ofrecera la opcion de terminar el juego o seguir jugando. Si se sigue, se redibujaran las uniones.
+
+### Fin del juego
+Si el jugador recibe tres strikes o elige terminar el juego luego de 5 fases, el juego termina. Se lo lleva a una pantalla de resumen de puntaje. Alli deberan aparecer los siguientes valores:
+ - Puntaje.
+ - Cantidad de strikes.
+ - Cantidad de receptoras destruidas.
+ - Cantidad de mensajes bloqueados (Que no pudieron llegar a la terminal por caminos bloqueados).
+ 
+ Se debe ofrecer la opcion de compartir el puntaje (Y el juego) en las redes sociales.
