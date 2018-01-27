@@ -6,31 +6,31 @@ Juego de simulación de control de redes en perspectiva top-down 2D, inspirado e
 
 ## Objetivos:
 #### Objetivo corto plazo:
-El jugador debe interceptar un mensaje encriptado antes de que llegue al receptor, desactivando las antenas de su camino. 
+El jugador debe interceptar un mensaje encriptado antes de que llegue al receptor, desactivando las antenas de su camino hasta, eventualmente, desactivar la final o impedir que hayan caminos hasta esta. 
 
 #### Objetivo mediano plazo:
-Lograr la mayor puntuación posible.
+Lograr la mayor puntuación posible y compartirla en redes sociales (Ñaca ñaca).
 
 #### Objetivo largo plazo:
 Revelar historia por medio de los mensajes desencriptados (Opcional en desarrollo).
 
-## Al dibujarse el mapa:
+## Al dibujarse el mapa tener en cuenta:
 - Las _antenas_ son colocadas con _uniones_ aleatorias entre si.
 - Algunas de estas _uniones_ estan rotas y no pueden enviarse mensajes a traves de ellas. Esto es invisible al jugador.
-- Internamente el programa plantea una ruta invisible entre la antena inicial (Emisora) y la final (Receptora).
+- Internamente el programa plantea una ruta invisible entre la antena inicial (Emisora) y la final (Receptora). En la esquina superior derecha se mostrara la cantidad de antenas por las que debe pasar para completar la ruta.
 - Todas las _antenas_, menos la emisora, inician desactivadas. La emisora comenzara a parpadear intermitentemente por la cantidad de        distancia que esta el mensaje de ella (inicialmente 1, debido a que estara en camino a la primera antena). Alternativamente, podra      aparecer el numero debajo de la antena.
-- El mensaje viajara a una velocidad fija (5 segundos por antena). Ej: En una ruta que deba pasar por cuatro antenas, el mensaje tardara 20 segundos (AE -> A1 -> A2 -> A3 -> AR).
+- El mensaje viajara a una velocidad fija (10 segundos por antena). . Ej: En una ruta que deba pasar por cuatro antenas, el mensaje tardara 40 segundos (AE -> A1 -> A2 -> A3 -> AR).
 
 ## Gameplay
 - El jugador puede clickear sobre cualquier antena desactivada (o aparentemente desactivada). 
-- Al clickearla, _pingeara_ hacia ella. Se perdera un segundo (1) por cada trayecto a recorrer (Si esta a una antena de distancia, perdera dos segundos, uno de ida y uno de vuelta). Esto hace que pingear a antenas mas lejanas tarde mas, aumentando el riesgo que conlleva un mal pingado.
+- Al clickearla, _pingeara_ hacia ella. Se perdera un segundo (1) por cada trayecto a recorrer desde la antena emisora (Si esta a una antena de distancia, perdera dos segundos, uno de ida y uno de vuelta). Esto hace que pingear a antenas mas lejanas tarde mas, aumentando el riesgo que conlleva un mal pingado.
 ### Al pingear puede pasar una de las siguientes cosas:   
- - Si la ruta no pasa por ahi, avisa que el camino esta libre.
+ - Si la ruta no pasa por ahi, avisa que el camino esta libre. Puede pasar por alli a futuro, pero no ahora.
  - Si el camino entre la ultima antena comprobada como parte de la ruta y la antena pingeada esta rota, avisa que el camino esta roto.
- - Si la ruta de comunicación actual pasa por esta antena, avisa que esta ocupada.
-   - En este ultimo caso avisara si ya ha pasado por alli (Aparece un 1, si esta siendo transmitido desde alli) o si aun no ha pasado        (Aparece un 0). De ambas maneras la antena aparecer activa y el jugador gana 1 punto.
+ - Si la ruta de comunicación (Espacio entre la ultima antena y la proxima) actual pasa por esta antena, avisa que esta ocupada.
+   - En este ultimo caso avisara si ya ha pasado por alli (Aparece un 1, si esta siendo transmitido desde alli) o si aun no ha pasado        (Aparece un 0). De ambas maneras la antena aparece activa y el jugador gana 1 punto.
    - En el caso de que ya haya pasado los pingeos pasaran automaticamente por alli.
-   - En el caso de que aun no haya pasado se podra anular la antena, si se disponen de tokens de anulación.
+   - En el caso de que aun no haya pasado se podra anular la antena, si se disponen de tokens de anulación. Si el anular esa antena provoca que el camino deba ser replanteado, el numero de la esquina superior derecha se actualiza
    
 ### Final de fase
 La fase termina una vez que:
