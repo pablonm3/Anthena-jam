@@ -10,6 +10,7 @@ public class ActivarAnteas : MonoBehaviour {
 	public int CantidadDeAntenas;
 	public float Cadencia;
 	void Start () {
+		Debug.Log ("starting the game");
 		Antenas = new GameObject[CantidadDeAntenas];
 		Invoke ("InicializarAntenas",1f);
 	}
@@ -23,8 +24,7 @@ public class ActivarAnteas : MonoBehaviour {
 
 	public void activarAntena(){
 		antenaScript = GetProximaAntenaScript();
-		antenaScript.ActivarAntena ();
-		
+		antenaScript.ActivarAntena();
 	}
 
 
@@ -32,19 +32,15 @@ public class ActivarAnteas : MonoBehaviour {
 		int antena =  Random.Range (0, CantidadDeAntenas);
 		antenaScript =  Antenas [antena].GetComponent<Antena> ();
 		int cantAntenas = Antenas.Length,
-			antenasProbadas = 0;
+			antenasRepetidas = 0;
 		while(antenaScript.Encendida) {
 			antena =  Random.Range (0, CantidadDeAntenas);
 			antenaScript =  Antenas [antena].GetComponent<Antena> ();
-			Debug.Log ("AntenasProbadas: "+antenasProbadas.ToString ());
-			Debug.Log ("CantAntenas: "+cantAntenas.ToString ());
-
-			if(antenasProbadas == cantAntenas){
-				Debug.Log ("Holis");
+			if(antenasRepetidas == cantAntenas){
+				Debug.Log ("JUEGO TERMINADO, CARGANDO NUEVA ESCENA, ");
 				SceneManager.LoadScene (0);
 			}
-			antenasProbadas++;
-			return antenaScript;
+			antenasRepetidas++;
 		}
 		return antenaScript;
 	}
