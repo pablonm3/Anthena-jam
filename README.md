@@ -44,7 +44,7 @@ Revelar historia por medio de los mensajes desencriptados (Opcional en desarroll
          - Arranco el juego y pasaron 20 segundos. El mensaje se encuentra siendo transmitido entre AF & AC.
          - El jugador pingeo a AN (Recibio que no se puede entregar), y luego pingeo con AR y AP (Tardando 2 segundos en cada uno). Luego pingeo a la AL, pero el mensaje ya habia pasado por alli, por lo que muestra un 1. El numero de AO ya habria pasado a ser 2.
          - Rapidamente ambos numeros suben uno mas, porque el mensaje esta viajando de AF a AC. El jugador pingea a AF y a AC, y luego anula AD (en una confusion) y AC, ya que el mensaje aun no llego alli.
-         - Al momento de anular AC, la ruta se debe recalcular. La nueva ruta seria (AO -> AL -> AI -> AJ -> AM -> AA). Esta nueva ruta sigue teniendo 5 antenas, pero tardara 10 segundos mas en terminarse en lo que el mensaje vuelve de AF a AI y retoma la ruta.
+         - Al momento de anular AC, la ruta se debe recalcular. La nueva ruta seria (AO -> AL -> AI -> AJ -> AM -> AA). Esta nueva ruta sigue teniendo 5 antenas, pero tardara 10 segundos mas en terminarse en lo que el mensaje vuelve de AF a AI y retoma la ruta. 
 
 ### Final de fase
 La fase termina una vez que:
