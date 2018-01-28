@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework.Constraints;
+using UnityEditor.UI;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Experimental.UIElements;
 using Random = System.Random;
@@ -12,18 +14,22 @@ public class GameManager : MonoBehaviour
     public Random Random;
     public RedCom RedCom;
 
+    public int GenerationSeed = 435353451;
+
+    public Text MensajePing;
+    public bool DebugMode = false;
+
     public GameObject AntenaFisicaPrefab;
     public GameObject PingPrefab;
     public float TiempoDeTransmision = 5.0f;
     public float TiempoDePing = 0.25f;
 
-    public bool Pinging;
-    public bool PingingLlegoADestino;
-
     public Material MaterialInactiva;
     public Material MaterialTransmitiendo;
     public Material MaterialEstacion;
-    public Estacion EstacionRed;
+
+    private bool _pinging;
+    private bool _pingingLlegoADestino;
 
     private float _timerTransmision;
     private float _timerPing;
@@ -36,9 +42,14 @@ public class GameManager : MonoBehaviour
     private Antena _antenaDestinoPing;
     private GameObject _pingFisico;
 
+    private bool _pingExitoso;
+    private string _pingMensaje;
 
-    void Start () {
-        Random = new Random(435353451);
+    void Start ()
+    {
+        MensajePing.text = "";
+
+        Random = new Random(GenerationSeed);
 
         RedCom = new RedCom();
         RedCom.Generar(Random);
@@ -68,7 +79,9 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        RefreshTextosDistancias();
+        if (DebugMode) {
+            RefreshTextosDistancias();
+        }
     }
 
 	void Update () {
@@ -91,7 +104,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Ping
-	    if (Pinging) {
+	    if (_pinging) {
             _timerPing += Time.deltaTime;
 	        float alphaPing = _timerPing / TiempoDePing;
 	        float pingX = (1 - alphaPing) * _antenaTransmisoraPing.X +
@@ -136,7 +149,7 @@ public class GameManager : MonoBehaviour
 
     private void PingAntena(Antena antenaAPinguear)
     {
-        if (Pinging || antenaAPinguear == RedCom.AntenaEstacion)
+        if (_pinging || antenaAPinguear == RedCom.AntenaEstacion)
         {
             return;
         }
@@ -145,7 +158,7 @@ public class GameManager : MonoBehaviour
         _antenaTransmisoraPing = _antenaOrigenPing;
         _antenaDestinoPing = antenaAPinguear;
         _timerPing = 0;
-        Pinging = true;
+        _pinging = true;
 
         _pingFisico = Instantiate(PingPrefab, new Vector3(_antenaOrigenPing.X, _antenaOrigenPing.Y, 0), Quaternion.identity);
     }
@@ -157,7 +170,9 @@ public class GameManager : MonoBehaviour
         _antenasFisicas.Remove(antenaFisica);
         Destroy(antenaFisica);
 
-        RefreshTextosDistancias();
+        if (DebugMode) {
+            RefreshTextosDistancias();
+        }
     }
 
     private void RefreshTextosDistancias()
@@ -192,49 +207,75 @@ public class GameManager : MonoBehaviour
 
     private void TransmitirMensaje()
     {
-        GameObject antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-        if (_antenaTransmisoraMensaje == RedCom.AntenaEstacion) {
-            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialEstacion);
-        } else {
-            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialInactiva);
+        GameObject antenaFisicaTransmisora;
+        if (DebugMode) {
+            antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
+            if (_antenaTransmisoraMensaje == RedCom.AntenaEstacion)
+            {
+                CambiarMaterialAntena(antenaFisicaTransmisora, MaterialEstacion);
+            }
+            else
+            {
+                CambiarMaterialAntena(antenaFisicaTransmisora, MaterialInactiva);
+            }
         }
-
+        
         _antenaTransmisoraMensaje = _antenaTransmisoraMensaje.GetRuta(RedCom.AntenaReceptora);
         _antenaTransmisoraMensaje.MensajeTrasnmitido = true;
         if (_antenaTransmisoraMensaje == RedCom.AntenaReceptora) {
             MensajeEnDestino();
         }
 
-        antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-        CambiarMaterialAntena(antenaFisicaTransmisora, MaterialTransmitiendo);
+        if (DebugMode) {
+            antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
+            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialTransmitiendo);
+        }
     }
 
     private void TransmitirPing()
     {
-        GameObject antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-        if (_antenaTransmisoraMensaje == RedCom.AntenaEstacion)
-        {
-            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialEstacion);
-        }
-        else
-        {
-            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialInactiva);
-        }
-
         _antenaTransmisoraPing = _antenaTransmisoraPing.GetRuta(_antenaDestinoPing);
-        if (_antenaTransmisoraPing == _antenaDestinoPing) {
-            PingingLlegoADestino = true;
-            _antenaDestinoPing = _antenaOrigenPing;
-        }
 
-        if (PingingLlegoADestino && _antenaTransmisoraPing == _antenaOrigenPing) {
+        if (_pingingLlegoADestino && _antenaTransmisoraPing == _antenaOrigenPing) {
             ResultadoPing();
             Destroy(_pingFisico);
-            Pinging = false;
-        }
+            _pinging = false;
+        } else {
+            if (_antenaTransmisoraPing == _antenaDestinoPing)
+            {
+                _pingingLlegoADestino = true;
+                _pingExitoso = _antenaDestinoPing.MensajeTrasnmitido || _antenaTransmisoraMensaje.GetRuta(RedCom.AntenaReceptora) == _antenaDestinoPing;
 
-        antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-        CambiarMaterialAntena(antenaFisicaTransmisora, MaterialTransmitiendo);
+                _pingMensaje = "---INFORMACIÓN EN DESTINO / ANTENA #" + _antenaDestinoPing.Id + " ---\n";
+                int anchoMensaje = _pingMensaje.Count();
+                if (_pingExitoso)
+                {
+                    RedCom.CalcularRutas(_antenaTransmisoraMensaje);
+                    int distancia = _antenaDestinoPing.GetDistancia(_antenaTransmisoraMensaje);
+                    if (_antenaDestinoPing.MensajeTrasnmitido) {
+                        if (distancia == 0) {
+                            _pingMensaje += " ! EMITIENDO MENSAJE !\n";
+                        } else {
+                            _pingMensaje += "MENSAJE REEMITIDO - Distancia: " + distancia;
+                            if (distancia == 1) { _pingMensaje += " salto.\n"; }
+                            else { _pingMensaje += " saltos.\n"; }
+                        }
+                    } else {
+                        _pingMensaje += "! RECIBIENDO MENSAJE !\n";
+                    }  
+                }
+                else
+                {
+                    _pingMensaje += "El mensaje no paso por aquí.\n";
+                }
+
+                for (int i = 0; i < anchoMensaje - 1; i++) {
+                    _pingMensaje += "-";
+                }
+                
+                _antenaDestinoPing = _antenaOrigenPing;
+            }
+        }
     }
 
     private void MensajeEnDestino()
@@ -244,6 +285,6 @@ public class GameManager : MonoBehaviour
 
     private void ResultadoPing()
     {
-        
+        MensajePing.text = _pingMensaje;
     }
 }

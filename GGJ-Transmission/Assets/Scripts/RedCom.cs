@@ -29,17 +29,13 @@ public class RedCom
         float height = 2f * cam.orthographicSize;
         float width = height * cam.aspect;
 
-        GenerarGrafoAleatorio(random, 75, width - 2, height - 2);
-        //GenerarGrafoRectangular(random, 8, 8, width - 1, height - 1);
+        GenerarGrafoAleatorio(random, 90, -width/2 + 1, width/2 - 1, -height/2 + 2, height/2 - 1);
+        // GenerarGrafoRectangular(random, 8, 8, width - 1, height - 1);
 
         CalcularTodasLasRutas();
 
         AntenaReceptora = Antenas.ElementAt(random.Next(Antenas.Count));
-       // CalcularRutas(AntenaReceptora);
-
         AntenaEmisora = ElegirAntenaEmisora(random, 6, 10);
-       // CalcularRutas(AntenaEmisora);
-
         AntenaEstacion = ElegirAntenaEstacion(random, 3, 3);
     }
 
@@ -100,17 +96,19 @@ public class RedCom
         }
     }
 
-    private void GenerarGrafoAleatorio(Random random, int numeroNodos, float anchoMapa, float altoMapa)
+    private void GenerarGrafoAleatorio(Random random, int numeroNodos, float x0, float x1, float y0, float y1)
     {
         int idNodo = 0;
+        float anchoMapa = Math.Abs(x1 - x0);
+        float altoMapa  = Math.Abs(y1 - y0);
         for (int i = 0; i < numeroNodos; i++)
         {
             Antena nuevaAntena = new Antena(idNodo++, this);
             bool posicionExitosa = false;
             while (!posicionExitosa && i < GenAleatoriaMaxIntentosPonerNodo)
             {
-                nuevaAntena.X = anchoMapa * ((float)random.NextDouble() - 0.5f);
-                nuevaAntena.Y = altoMapa * ((float)random.NextDouble() - 0.5f);
+                nuevaAntena.X = anchoMapa * (float) random.NextDouble() + x0;
+                nuevaAntena.Y = altoMapa  * (float) random.NextDouble() + y0;
 
                 posicionExitosa = true;
                 foreach (Antena nodo in Antenas)
