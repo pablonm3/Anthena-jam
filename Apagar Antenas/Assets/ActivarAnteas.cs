@@ -8,7 +8,7 @@ public class ActivarAnteas : MonoBehaviour {
 	public GameObject[] Antenas;
 
 	public int CantidadDeAntenas;
-	public float Cadencia;
+	public float Cadencia = 3000;
 	void Start () {
 		Debug.Log ("starting the game");
 		Antenas = new GameObject[CantidadDeAntenas];
@@ -16,31 +16,49 @@ public class ActivarAnteas : MonoBehaviour {
 	}
 
 	public void InicializarAntenas(){
-		for(int i = 0 ; i < CantidadDeAntenas ; i++){
-			Antenas = GameObject.FindGameObjectsWithTag ("Antena");
-		}
+		Antenas = GameObject.FindGameObjectsWithTag ("Antena");
+		InvokeRepeating ("activarAntena", 0, Cadencia);
+		InvokeRepeating ("reducirCadencia", 0, 5);
+	}
+
+	public void reducirCadencia(){
+		Debug.Log ("cadencia: "+ Cadencia);
+		if (Cadencia > 0.3f)
+			Cadencia -= 0.3f;
+		else
+			Cadencia = 0.2f;
+		CancelInvoke("activarAntena");
 		InvokeRepeating ("activarAntena",0,Cadencia);
 	}
 
 	public void activarAntena(){
+		Debug.Log ("desactivate next anthena");
 		antenaScript = GetProximaAntenaScript();
-		antenaScript.ActivarAntena();
+		if(antenaScript != null)
+			antenaScript.ActivarAntena();
 	}
 
+	public bool todasLasAntenasEncendidas(){
+		for(int i = 0 ; i < CantidadDeAntenas ; i++){
+			Antena antenaScript =  Antenas[i].GetComponent<Antena>();
+			if (!antenaScript.Encendida)
+				return false;
+		}
+		return true;
+	}
 
 	public Antena GetProximaAntenaScript(){
-		int antena =  Random.Range (0, CantidadDeAntenas);
-		antenaScript =  Antenas [antena].GetComponent<Antena> ();
-		int cantAntenas = Antenas.Length,
-			antenasRepetidas = 0;
+		int posNextAntena =  Random.Range (0, CantidadDeAntenas);
+		antenaScript =  Antenas [posNextAntena].GetComponent<Antena>();
+		if (todasLasAntenasEncendidas()) {
+			Debug.Log("JUEGO TERMINADO, CARGANDO NUEVA ESCENA");
+			SceneManager.LoadScene(0);
+			CancelInvoke("activarAntena");
+			return null;
+		}
 		while(antenaScript.Encendida) {
-			antena =  Random.Range (0, CantidadDeAntenas);
-			antenaScript =  Antenas [antena].GetComponent<Antena> ();
-			if(antenasRepetidas == cantAntenas){
-				Debug.Log ("JUEGO TERMINADO, CARGANDO NUEVA ESCENA, ");
-				SceneManager.LoadScene (0);
-			}
-			antenasRepetidas++;
+			posNextAntena =  Random.Range (0, CantidadDeAntenas);
+			antenaScript =  Antenas [posNextAntena].GetComponent<Antena> ();
 		}
 		return antenaScript;
 	}
