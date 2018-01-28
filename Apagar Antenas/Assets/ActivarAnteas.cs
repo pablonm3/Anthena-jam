@@ -10,7 +10,6 @@ public class ActivarAnteas : MonoBehaviour {
 			   antenasGeneradasEnParalelo = 1;
 	public float Cadencia = 3000;
 	void Start () {
-		Debug.Log ("starting the game");
 		Antenas = new GameObject[CantidadDeAntenas];
 		Invoke ("InicializarAntenas", 1f);
 	}
@@ -45,11 +44,10 @@ public class ActivarAnteas : MonoBehaviour {
 	}
 
 	public void aumentarToquesNecesariosParaDesactivar(){
-		Debug.Log("aumentar toques necesarios");
+		Touch.incCantidadDeToquesTemporalmente();
 	}		
 
 	public void reducirCadencia(){
-		Debug.Log ("cadencia: "+ Cadencia);
 		if (Cadencia > 0.3f)
 			Cadencia -= 0.3f;
 		else
@@ -78,7 +76,6 @@ public class ActivarAnteas : MonoBehaviour {
 		Antena[] antenasScript = new Antena[antenasGeneradasEnParalelo];
 		for (int i = 0; i < antenasScript.Length; i++) {
 			if (todasLasAntenasEncendidas()) {
-				Debug.Log("JUEGO TERMINADO, CARGANDO NUEVA ESCENA");
 				SceneManager.LoadScene(0);
 				CancelInvoke("activarAntenas");
 				return new Antena[0];
