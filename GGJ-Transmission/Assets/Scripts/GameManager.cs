@@ -77,6 +77,21 @@ public class GameManager : MonoBehaviour
             if (nodo.AntenaGrande) {
                 antenaFisica.transform.localScale *= 1.5f;
             }
+
+            foreach (var conexion in nodo.Conexiones) {
+                GameObject objetoLinea = new GameObject();
+                var lineRenderer = objetoLinea.AddComponent< LineRenderer>();
+                lineRenderer.positionCount = 2;
+                lineRenderer.SetPosition(0, new Vector3(nodo.X, nodo.Y, 5));
+                lineRenderer.SetPosition(1, new Vector3(conexion.X, conexion.Y, 5));
+
+                lineRenderer.startWidth = 0.05f;
+                lineRenderer.endWidth = 0.02f;
+
+                lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.black;
+            }
         }
 
         if (DebugMode) {
@@ -207,29 +222,17 @@ public class GameManager : MonoBehaviour
 
     private void TransmitirMensaje()
     {
-        GameObject antenaFisicaTransmisora;
-        if (DebugMode) {
-            antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-            if (_antenaTransmisoraMensaje == RedCom.AntenaEstacion)
-            {
-                CambiarMaterialAntena(antenaFisicaTransmisora, MaterialEstacion);
-            }
-            else
-            {
-                CambiarMaterialAntena(antenaFisicaTransmisora, MaterialInactiva);
-            }
-        }
-        
+        GameObject antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
+        antenaFisicaTransmisora.GetComponent<Animator>().SetBool("Emitiendo", false);
+
         _antenaTransmisoraMensaje = _antenaTransmisoraMensaje.GetRuta(RedCom.AntenaReceptora);
         _antenaTransmisoraMensaje.MensajeTrasnmitido = true;
         if (_antenaTransmisoraMensaje == RedCom.AntenaReceptora) {
             MensajeEnDestino();
         }
 
-        if (DebugMode) {
-            antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
-            CambiarMaterialAntena(antenaFisicaTransmisora, MaterialTransmitiendo);
-        }
+        antenaFisicaTransmisora = GetAntenaFisica(_antenaTransmisoraMensaje);
+        antenaFisicaTransmisora.GetComponent<Animator>().SetBool("Emitiendo", true);
     }
 
     private void TransmitirPing()
