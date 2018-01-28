@@ -16,7 +16,7 @@ public class CrearAntenas : MonoBehaviour {
 			x = Random.Range (-11, 11);
 			y = Random.Range (-4, 7);
 			AntenasInstanciadas[i] = Instantiate (Antena, new Vector3 (x, y, 0), Quaternion.identity) as GameObject;
-			Invoke ("reacomodar", .15f);
+			Invoke ("Reacomodar", .15f);
 
 		}
 
