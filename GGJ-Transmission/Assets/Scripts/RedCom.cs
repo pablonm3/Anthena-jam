@@ -10,12 +10,13 @@ public class RedCom
 {
     private const int DistanciaSinConexion = int.MaxValue;
     private const int GenAleatoriaMaxIntentosPonerNodo = 1000;
-    private const float GenAleatoriaDistanciaDeConexion = 3;
-    private const float GenAleatoriaMinDistanciaEntreNodos = 0.5f;
+    private const float GenAleatoriaDistanciaDeConexion = 2.5f;
+    private const float GenAleatoriaMinDistanciaEntreNodos = 1.25f;
 
     public ICollection<Antena> Antenas { get; set; }
     public Antena AntenaEmisora;
     public Antena AntenaReceptora;
+    public Antena AntenaEstacion;
 
     public RedCom()
     {
@@ -28,18 +29,18 @@ public class RedCom
         float height = 2f * cam.orthographicSize;
         float width = height * cam.aspect;
 
-        // GenerarGrafoAleatorio(Random, 15, width - 1, height - 1);
-        GenerarGrafoRectangular(random, 10, 10, width - 1, height - 1);
+        GenerarGrafoAleatorio(random, 75, width - 2, height - 2);
+        //GenerarGrafoRectangular(random, 8, 8, width - 1, height - 1);
+
+        CalcularTodasLasRutas();
 
         AntenaReceptora = Antenas.ElementAt(random.Next(Antenas.Count));
-        CalcularCaminosMinimos(AntenaReceptora);
+       // CalcularRutas(AntenaReceptora);
 
-        AntenaEmisora = ElegirAntenaEmisora(random, 7, 10);
-    }
+        AntenaEmisora = ElegirAntenaEmisora(random, 6, 10);
+       // CalcularRutas(AntenaEmisora);
 
-    public void RecalcularRuta()
-    {
-       CalcularCaminosMinimos(AntenaReceptora); 
+        AntenaEstacion = ElegirAntenaEstacion(random, 3, 3);
     }
 
     public void DestruirAntena(Antena antenaADestruir)
@@ -49,7 +50,54 @@ public class RedCom
             a.Conexiones.Remove(antenaADestruir);
         }
 
-        RecalcularRuta();
+        CalcularTodasLasRutas();
+    }
+
+    public void CalcularTodasLasRutas()
+    {
+        foreach (var antena in Antenas)
+        {
+            CalcularRutas(antena);
+        }
+    }
+
+    public void CalcularRutas(Antena antenaDestino)
+    {
+        foreach (var antena in Antenas)
+        {
+            antena.Visitada = false;
+            antena.SetRuta(antenaDestino, null);
+            antena.SetDistancia(antenaDestino, DistanciaSinConexion);
+        }
+
+        List<Antena> antenasPorVisitar = new List<Antena>();
+        antenaDestino.SetDistancia(antenaDestino, 0);
+        antenaDestino.Visitada = true;
+
+        antenasPorVisitar.Add(antenaDestino);
+        while (antenasPorVisitar.Any())
+        {
+            Antena antenaActual = antenasPorVisitar.First();
+            antenasPorVisitar.RemoveAt(0);
+            antenaActual.Visitada = true;
+
+            foreach (var conexion in antenaActual.Conexiones)
+            {
+                if (conexion.Visitada)
+                {
+                    continue;
+                }
+
+                int distanciaConexion = antenaActual.GetDistancia(antenaDestino) + 1;
+                if (distanciaConexion < conexion.GetDistancia(antenaDestino))
+                {
+                    conexion.SetDistancia(antenaDestino, distanciaConexion);
+                    conexion.SetRuta(antenaDestino, antenaActual);
+                }
+
+                antenasPorVisitar.Add(conexion);
+            }
+        }
     }
 
     private void GenerarGrafoAleatorio(Random random, int numeroNodos, float anchoMapa, float altoMapa)
@@ -57,7 +105,7 @@ public class RedCom
         int idNodo = 0;
         for (int i = 0; i < numeroNodos; i++)
         {
-            Antena nuevaAntena = new Antena(idNodo++);
+            Antena nuevaAntena = new Antena(idNodo++, this);
             bool posicionExitosa = false;
             while (!posicionExitosa && i < GenAleatoriaMaxIntentosPonerNodo)
             {
@@ -104,6 +152,8 @@ public class RedCom
                 }
             }
         }
+
+        UnirGrupos();
     }
 
     private void GenerarGrafoRectangular(Random random, int anchoGrafo, int altoGrafo, float anchoMapa, float altoMapa)
@@ -116,7 +166,7 @@ public class RedCom
         {
             for (int x = 0; x < anchoGrafo; x++)
             {
-                Antena nuevoAntena = new Antena(idNodo++)
+                Antena nuevoAntena = new Antena(idNodo++, this)
                 {
                     X = x * distanciaHorizontal - anchoMapa / 2,
                     Y = -y * distanciaVertical + altoMapa / 2
@@ -159,10 +209,10 @@ public class RedCom
 
     private Antena ElegirAntenaEmisora(Random random, int distanciaMinima, int distanciaMaxima)
     {
-        ICollection<Antena> antenasCandidatas = Antenas.Where(a => a.DistanciaAlReceptor >= distanciaMinima && a.DistanciaAlReceptor <= distanciaMaxima).ToList();
+        ICollection<Antena> antenasCandidatas = Antenas.Where(a => a.GetDistancia(AntenaReceptora) >= distanciaMinima && a.GetDistancia(AntenaReceptora) <= distanciaMaxima).ToList();
         if (antenasCandidatas.Count == 0)
         {
-            antenasCandidatas = Antenas.Where(a => a.DistanciaAlReceptor > distanciaMinima).ToList();
+            antenasCandidatas = Antenas.Where(a => a.GetDistancia(AntenaReceptora) > distanciaMinima).ToList();
             if (antenasCandidatas.Count == 0)
             {
                 antenasCandidatas = Antenas;
@@ -172,39 +222,98 @@ public class RedCom
         return antenasCandidatas.ElementAt(random.Next(antenasCandidatas.Count));
     }
 
-    private void CalcularCaminosMinimos(Antena antenaReceptora)
+    private Antena ElegirAntenaEstacion(Random random, int distanciaMinimaReceptora, int distanciaMinimaEmisora)
     {
-        foreach (var antena in Antenas) {
-            antena.Visitada = false;
-            antena.CaminoHaciaElReceptor = null;
-            antena.DistanciaAlReceptor = DistanciaSinConexion;
+        ICollection<Antena> antenasCandidatas = Antenas.Where(a => a.GetDistancia(AntenaReceptora) >= distanciaMinimaReceptora && a.GetDistancia(AntenaEmisora) >= distanciaMinimaEmisora).ToList();
+        if (antenasCandidatas.Count == 0)
+        {
+            antenasCandidatas = Antenas;
         }
 
-        List<Antena> antenasPorVisitar = new List<Antena>();
-        antenaReceptora.DistanciaAlReceptor = 0;
-        antenaReceptora.Visitada = true;
+        return antenasCandidatas.ElementAt(random.Next(antenasCandidatas.Count));
+    }
 
-        antenasPorVisitar.Add(antenaReceptora);
-        while (antenasPorVisitar.Any()) {
+    private void UnirGrupos()
+    {
+        int cantidadGrupos = int.MaxValue;
+        while (cantidadGrupos > 1) {
+            foreach (var antena in Antenas) {
+                antena.Grupo = -1;
+            }
+            int numeroDeGrupo = 0;
+            foreach (var antena in Antenas)
+            {
+                if (antena.Grupo != -1)
+                {
+                    continue;
+                }
+
+                List<Antena> grupoDeAntenas = EncontrarGrupo(antena, numeroDeGrupo);
+                List<Antena> antenasFueraDelGrupo = Antenas.Where(a => !grupoDeAntenas.Contains(a)).ToList();
+
+                float distanciaMinima = float.MaxValue;
+                Antena conexionInterna = null;
+                Antena conexionExterna = null;
+                foreach (var antenaEnGrupo in grupoDeAntenas)
+                {
+                    foreach (var antenaOtroGrupo in antenasFueraDelGrupo)
+                    {
+                        float dX = antenaOtroGrupo.X - antenaEnGrupo.X;
+                        float dY = antenaOtroGrupo.Y - antenaEnGrupo.Y;
+                        float d2 = dX * dX + dY * dY;
+
+                        if (d2 < distanciaMinima)
+                        {
+                            distanciaMinima = d2;
+                            conexionInterna = antenaEnGrupo;
+                            conexionExterna = antenaOtroGrupo;
+                        }
+                    }
+                }
+
+                if (conexionInterna != null) {
+                    conexionInterna.Conexiones.Add(conexionExterna);
+                    conexionExterna.Conexiones.Add(conexionInterna);
+                    conexionInterna.AntenaGrande = true;
+                    conexionExterna.AntenaGrande = true;
+
+                    // Agrega la sección conectada al grupo actual
+                    EncontrarGrupo(conexionExterna, numeroDeGrupo);
+                }
+
+                
+                numeroDeGrupo++;
+            }
+            cantidadGrupos = numeroDeGrupo;
+        }
+    }
+
+    private List<Antena> EncontrarGrupo(Antena antenaInicial, int numeroDeGrupo)
+    {
+        foreach (var antena in Antenas)
+        {
+            antena.Visitada = false;
+        }
+        List<Antena> antenasPorVisitar = new List<Antena>();
+        antenasPorVisitar.Add(antenaInicial);
+        List<Antena> antenasEnGrupo = new List<Antena>();
+
+        while(antenasPorVisitar.Any()) {
             Antena antenaActual = antenasPorVisitar.First();
             antenasPorVisitar.RemoveAt(0);
             antenaActual.Visitada = true;
+            antenaActual.Grupo = numeroDeGrupo;
+            antenasEnGrupo.Add(antenaActual);
 
             foreach (var conexion in antenaActual.Conexiones) {
                 if (conexion.Visitada) {
                     continue;
                 }
 
-                int distanciaConexion = antenaActual.DistanciaAlReceptor + 1;
-                if (distanciaConexion < conexion.DistanciaAlReceptor) {
-                    conexion.DistanciaAlReceptor = distanciaConexion;
-                    conexion.CaminoHaciaElReceptor = antenaActual;
-                }
-
-                if (!conexion.Visitada) {
-                    antenasPorVisitar.Add(conexion);
-                }
+                antenasPorVisitar.Add(conexion);
             }
         }
+
+        return antenasEnGrupo;
     }
 };
