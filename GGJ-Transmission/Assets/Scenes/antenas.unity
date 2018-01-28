@@ -139,7 +139,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.5
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -188,7 +188,6 @@ GameObject:
   - component: {fileID: 702563810}
   - component: {fileID: 702563811}
   - component: {fileID: 702563812}
-  - component: {fileID: 702563813}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -222,7 +221,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AntenaFisicaPrefab: {fileID: 1730810120532806, guid: 042802bb96629414e9fe2ce61ef5c6fa,
     type: 2}
+  PingPrefab: {fileID: 1313057186875048, guid: 71fcc85937f00d74c9e1c37c3ba75b69, type: 2}
   TiempoDeTransmision: 5
+  TiempoDePing: 0.25
+  Pinging: 0
+  MaterialInactiva: {fileID: 2100000, guid: f0e3540a2152be744b55dd1c0ecf80f1, type: 2}
+  MaterialTransmitiendo: {fileID: 2100000, guid: 3eb4443ec5345b340adc857655e58c59,
+    type: 2}
+  MaterialEstacion: {fileID: 2100000, guid: 837887f6bf2a7f74aab9cac9ff44566b, type: 2}
 --- !u!120 &702563812
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -311,20 +317,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
---- !u!114 &702563813
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 702563809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86013e7c6a4112144bfed0ebac6cbf42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AntenaFisicaPrefab: {fileID: 1730810120532806, guid: 042802bb96629414e9fe2ce61ef5c6fa,
-    type: 2}
-  TiempoDeTransmision: 5
 --- !u!1 &1475847372
 GameObject:
   m_ObjectHideFlags: 0
